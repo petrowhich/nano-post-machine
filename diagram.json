@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "author": "Anonymous maker",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-arduino-nano", "id": "nano", "top": -81.6, "left": -38.9, "attrs": {} },
+    {
+      "type": "wokwi-lcd2004",
+      "id": "lcd1",
+      "top": -3.2,
+      "left": 140,
+      "attrs": { "pins": "i2c" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn1",
+      "top": 220.7,
+      "left": 147.5,
+      "rotate": 90,
+      "attrs": { "color": "blue" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn2",
+      "top": 220.7,
+      "left": 195.5,
+      "rotate": 90,
+      "attrs": { "color": "blue" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn3",
+      "top": 220.7,
+      "left": 291.5,
+      "rotate": 90,
+      "attrs": { "color": "yellow" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn4",
+      "top": 220.7,
+      "left": 339.5,
+      "rotate": 90,
+      "attrs": { "color": "yellow" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn5",
+      "top": 220.7,
+      "left": 387.5,
+      "rotate": 90,
+      "attrs": { "color": "yellow" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn6",
+      "top": 220.7,
+      "left": 243.5,
+      "rotate": 90,
+      "attrs": { "color": "blue" }
+    },
+    {
+      "type": "wokwi-buzzer",
+      "id": "bz1",
+      "top": 76.8,
+      "left": 28.8,
+      "rotate": 180,
+      "attrs": { "volume": "0.1" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn7",
+      "top": 297.5,
+      "left": 147.5,
+      "rotate": 90,
+      "attrs": { "color": "blue" }
+    }
+  ],
+  "connections": [
+    [ "lcd1:GND", "nano:GND.1", "black", [ "h0" ] ],
+    [ "nano:5V", "lcd1:VCC", "red", [ "v0" ] ],
+    [ "lcd1:SDA", "nano:A4", "green", [ "h0" ] ],
+    [ "lcd1:SCL", "nano:A5", "green", [ "h0" ] ],
+    [ "nano:12", "btn1:2.l", "green", [ "v-9.6", "h-19.2", "v288", "h-9.6" ] ],
+    [ "btn1:1.l", "nano:GND.1", "black", [ "v-19.2", "h-76.8" ] ],
+    [ "btn2:1.l", "nano:GND.1", "black", [ "v-19.2", "h-134.4" ] ],
+    [ "btn3:1.l", "nano:GND.1", "black", [ "v-19.2", "h-182.4" ] ],
+    [ "btn4:1.l", "nano:GND.1", "black", [ "v-19.2", "h-230.4" ] ],
+    [ "btn5:1.l", "nano:GND.1", "black", [ "v-19.2", "h-278.4" ] ],
+    [ "nano:9", "btn3:2.l", "green", [ "v278.4", "h19.2" ] ],
+    [ "btn4:2.l", "nano:8", "green", [ "v-9.6", "h-345.8" ] ],
+    [ "btn5:2.l", "nano:7", "green", [ "v-9.6", "h-384.2" ] ],
+    [ "bz1:1", "nano:GND.1", "green", [ "v0" ] ],
+    [ "bz1:2", "nano:13", "green", [ "v0", "h-86" ] ],
+    [ "btn2:2.l", "nano:11", "green", [ "v-9.6", "h-230.6" ] ],
+    [ "nano:10", "btn6:2.l", "green", [ "v278.4", "h268.8" ] ],
+    [ "btn6:1.l", "nano:GND.1", "black", [ "v-19.2", "h0", "v0", "h-182.4" ] ],
+    [ "btn7:2.l", "nano:6", "green", [ "v0", "h-134.6" ] ],
+    [ "btn7:1.l", "nano:GND.1", "black", [ "v0", "h-76.8" ] ]
+  ],
+  "dependencies": {}
+}

@@ -17,7 +17,7 @@
       "top": 220.7,
       "left": 147.5,
       "rotate": 90,
-      "attrs": { "color": "blue" }
+      "attrs": { "color": "green" }
     },
     {
       "type": "wokwi-pushbutton",
@@ -33,7 +33,7 @@
       "top": 220.7,
       "left": 291.5,
       "rotate": 90,
-      "attrs": { "color": "yellow" }
+      "attrs": { "color": "red" }
     },
     {
       "type": "wokwi-pushbutton",
@@ -41,7 +41,7 @@
       "top": 220.7,
       "left": 339.5,
       "rotate": 90,
-      "attrs": { "color": "yellow" }
+      "attrs": { "color": "red" }
     },
     {
       "type": "wokwi-pushbutton",
@@ -49,7 +49,7 @@
       "top": 220.7,
       "left": 387.5,
       "rotate": 90,
-      "attrs": { "color": "yellow" }
+      "attrs": { "color": "red" }
     },
     {
       "type": "wokwi-pushbutton",
@@ -57,7 +57,7 @@
       "top": 220.7,
       "left": 243.5,
       "rotate": 90,
-      "attrs": { "color": "blue" }
+      "attrs": { "color": "green" }
     },
     {
       "type": "wokwi-buzzer",
@@ -73,7 +73,7 @@
       "top": 297.5,
       "left": 147.5,
       "rotate": 90,
-      "attrs": { "color": "blue" }
+      "attrs": { "color": "grey" }
     }
   ],
   "connections": [

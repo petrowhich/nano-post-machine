@@ -95,36 +95,6 @@ bool isButtonDown(int PIN) {
   return digitalRead(PIN) == LOW;
 }
 
-void rusText(const __FlashStringHelper* s) {
-  #define SHOW(c) lcd.print(c)
-  //#define SHOW(c) Serial.print(c)
-
-  size_t strlen = strlen_P((const char*)s);
-  for (size_t i = 0; i < strlen; i++) {
-    char c = pgm_read_byte_near((const char*)s + i);
-    switch (c) {
-      case 'А': SHOW("A"); break;
-      case 'а': SHOW("a"); break;
-      case 'Б': SHOW("\xA0"); break;
-      case 'б': SHOW("\xB2"); break;
-
-      case 'П': SHOW("\xA8"); break;
-
-      case 'о': SHOW("o"); break;
-  
-      case 'с': SHOW("с"); break;
-
-      case 'т': SHOW("\xBF"); break;
-
-      default: break;
-    }
-  }
-}
-
-void resetTape() {
-  // ...
-}
-
 void showTape() {
   lcd.setCursor(0, 1);
   for (size_t i = 0; i < tapeSize; i++)
@@ -177,8 +147,6 @@ void showState() {
 void setup() {
   lcd.init();
   lcd.backlight();
-
-  //rusText(F("Машина Поста"));
 
   pinMode(BTN_LEFT, INPUT);
   pinMode(BTN_RIGHT, INPUT);

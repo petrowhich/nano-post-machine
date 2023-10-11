@@ -183,7 +183,7 @@ void setup() {
 
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print("Post's machine");
+  lcd.print("Nano Post Machine");
   showTape();
 }
 

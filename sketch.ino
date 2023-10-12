@@ -1,6 +1,6 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
-#include "lib/Button.h"
+#include "Button.h"
 
 #define BTN_LEFT_PIN 12
 #define BTN_CHANGE_PIN 11

@@ -30,11 +30,12 @@ Button btn_save(BTN_SAVE_PIN);
 
 #define arrayLength(x) (sizeof(x) / sizeof(x[0]))
 #define tapeSize COLUMNS
-#define anyButtonDown() (isButtonDown(BTN_LEFT) || isButtonDown(BTN_CHANGE) \
-                         || isButtonDown(BTN_RIGHT) || isButtonDown(BTN_RUN) \
-                         || isButtonDown(BTN_PAUSE) || isButtonDown(BTN_STOP) \
-                         || isButtonDown(BTN_CLEAR) || isButtonDown(BTN_LOAD) \
-                         || isButtonDown(BTN_SAVE))
+#define isButtonDown(object) (object).pressed()
+#define anyButtonDown() (isButtonDown(btn_left) || isButtonDown(btn_change) \
+                         || isButtonDown(btn_right) || isButtonDown(btn_run) \
+                         || isButtonDown(btn_pause) || isButtonDown(btn_stop) \
+                         || isButtonDown(btn_clear) || isButtonDown(btn_load) \
+                         || isButtonDown(btn_save))
 
 struct Instruction {
   char operation;
@@ -102,11 +103,6 @@ void machineCycle() {
     programPtr = current->jump[0];
   }
   cyclesUsed++;
-}
-
-bool isButtonDown(int PIN) {
-  delay(5);
-  return digitalRead(PIN) == LOW;
 }
 
 #define byteIntoBits(x) ( \

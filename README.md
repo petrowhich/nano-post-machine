@@ -1,5 +1,11 @@
 # Nano Post Machine
 
+<details>
+  <summary>In other languages</summary>
+
+  - [Русский](README.ru.md)
+</details>
+
 The Nano Post Machine is a simple digital machine that emulates the functionality of a Post–Turing machine, using Arduino Nano. It is designed to be compact and easy to use, making it suitable for educational purposes and small-scale automation tasks. The machine is controlled using a set of buttons and features a 20x4 LCD screen for displaying the current state of the machine.
 
 The machine operates on a fixed-length tape with configurable cell ("box") values, allowing users to input and manipulate data. It executes a set of predefined instructions, each represented by a single character, and supports basic operations such as reading and writing to the tape, moving the head left or right, and conditional branching. The program can be loaded into the machine's memory, and the execution can be controlled manually or automatically.

@@ -3,8 +3,7 @@
 	(modified)
 
 	original: Michael "madleech" Adams
-	modified: Uri "urish" Shaked, eugene-makeev, Mateusz Stadnik "matgla",
-Petrovich "petrowhich"
+	modified: Uri "urish" Shaked, eugene-makeev, Petrovich "petrowhich"
 	MIT licensed.
 */
 

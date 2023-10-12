@@ -38,22 +38,22 @@ const Instruction program[] = {
 
 ## Current features
 
-- non-programmable (a program is hard coded)
-- running the hard coded program
-- pausing execution
-- changing tape data before running the program and during a pause
-- ability to zero the tape
-- saving/loading the tape to RAM of the microcontroller
-- when stop button is pressed, returns to the initial head position
-- simple sound accompaniment as a feedback
+- non-programmable (program is hard-coded)
+- start hard-coded program
+- pause execution
+- changing data on the tape before program execution and during a pause
+- tape zeroing option
+- saving/loading the tape into the microcontroller RAM
+- return to the initial position of the head when the "Stop" button is pressed
+- simple audio as feedback
 
 ## Planned features
 
-- programmability (keypad may be used) with [Konstantin Polyakov](https://kpolyakov.spb.ru/prog/post.htm)-like syntax
-- showing listing of a program with vertical scrolling
+- programmability (maybe a numeric keyboard will be used) with a syntax similar to [Konstantin Polyakov](https://kpolyakov.spb.ru/prog/post.htm)'s
+- program listing with vertical scrolling
 - step-by-step execution
-- use of multi-button press to call menus
-- tape scrolling (breaking the limit of column width of a display) with in-place scrollbar: using arrows for each side to show if there is more tape
+- using multiple button presses to invoke menus
+- scrolling of the tape (overcoming display column width limitation) with a scroll bar in place: arrows for each side show if there is more tape
 - improved user interface
 - documentation
 

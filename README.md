@@ -1,7 +1,7 @@
 # Nano Post Machine
 
 <details>
-  <summary>In other languages</summary>
+  <summary>Languages</summary>
 
   - [Русский](README.ru.md)
 </details>

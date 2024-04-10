@@ -44,8 +44,6 @@ struct Instruction {
   byte jump[2];
 };
 
-//bool paused = false, firstTimePaused = true, executing = false, showCycles = true;
-
 byte generalBool = 0;
 #define getBool(bs) (generalBool & (1 << bs))
 #define setBool(bs, value) ((value) ? (generalBool |= (1 << bs)) : (generalBool &= ~(1 << bs)))
@@ -65,7 +63,7 @@ const Instruction program[] = {
   {'.', 0, 0}
 };
 const byte programSize = arrayLength(program), initialHeadPosition = 2;
-byte tapeStorageSize, head = initialHeadPosition, programPtr = 0, cyclesUsed = 0;
+byte tapeStorageSize, head = initialHeadPosition, savedHead, programPtr = 0, cyclesUsed = 0;
 
 void showError(const __FlashStringHelper * s) {
   byte sl = strlen_F(s);
@@ -123,26 +121,28 @@ void machineCycle() {
 }
 
 #define byteIntoBits(x) ( \
-  (x << 7) & 1 |          \
-  (x << 6) & 1 |          \
-  (x << 5) & 1 |          \
-  (x << 4) & 1 |          \
-  (x << 3) & 1 |          \
-  (x << 2) & 1 |          \
-  (x << 1) & 1 |          \
-  x & 1                   \
+  ((x << 7) & 1) |        \
+  ((x << 6) & 1) |        \
+  ((x << 5) & 1) |        \
+  ((x << 4) & 1) |        \
+  ((x << 3) & 1) |        \
+  ((x << 2) & 1) |        \
+  ((x << 1) & 1) |        \
+  (x & 1)                 \
 )
 
 void loadTape() {
   // W.I.P.
   for (byte i = tapeSize + 1; i > 0; i--)
     tape[i] = (tapeStorage[i / 8] >> (i & 7)) & 1;
+  head = savedHead;
 }
 
 void saveTape() {
   // W.I.P.
   for (byte i = tapeStorageSize + 1; i > 0; i--)
     tapeStorage[i] = byteIntoBits(tape[i / 8]);
+  savedHead = head;
 }
 
 void showTape() {

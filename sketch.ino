@@ -1,6 +1,7 @@
-#include <Wire.h>
-#include <LiquidCrystal_I2C.h>
+#include <avr/pgmspace.h>
 #include "Button.h"
+#include <LiquidCrystal_I2C.h>
+#include <Wire.h>
 
 #define BTN_LEFT_PIN 12
 #define BTN_CHANGE_PIN 11
@@ -36,13 +37,23 @@ Button btn_save(BTN_SAVE_PIN);
                          || isButtonDown(btn_pause) || isButtonDown(btn_stop) \
                          || isButtonDown(btn_clear) || isButtonDown(btn_load) \
                          || isButtonDown(btn_save))
+#define strlen_F(s) strlen_PF((PGM_P)s)
 
 struct Instruction {
   char operation;
   byte jump[2];
 };
 
-bool paused = false, firstTimePaused = true, executing = false, showCycles = true;
+//bool paused = false, firstTimePaused = true, executing = false, showCycles = true;
+
+byte generalBool = 0;
+#define getBool(bs) (generalBool & (1 << bs))
+#define setBool(bs, value) ((value) ? (generalBool |= (1 << bs)) : (generalBool &= ~(1 << bs)))
+#define paused 0
+#define firstTimePaused 1
+#define executing 2
+#define showCycles 4
+
 byte tape[tapeSize] = {
   0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
@@ -53,28 +64,34 @@ const Instruction program[] = {
   {'>', 0, 0},
   {'.', 0, 0}
 };
-const size_t programSize = arrayLength(program), initialHeadPosition = 2;
-size_t tapeStorageSize, head = initialHeadPosition, programPtr = 0, cyclesUsed = 0;
+const byte programSize = arrayLength(program), initialHeadPosition = 2;
+byte tapeStorageSize, head = initialHeadPosition, programPtr = 0, cyclesUsed = 0;
 
-void showError(const char * s) {
-  size_t sl = strlen(s);
-  tone(SPEAKER, 277.18, 200);
-  delay(200);
-  tone(SPEAKER, 261.63, 200);
-  delay(200);
-  int i = 0;
-  while (!isButtonDown(BTN_STOP)) {
+void showError(const __FlashStringHelper * s) {
+  byte sl = strlen_F(s);
+  tone(SPEAKER_PIN, 276, 100);
+  delay(100);
+  tone(SPEAKER_PIN, 262, 100);
+  delay(100);
+  byte i = 0;
+
+  byte state;
+  while ((state = digitalRead(BTN_STOP_PIN)) != LOW) {
     lcd.setCursor(6, 3);
-    if ((i = (i + 1) & 1) & 1)
+    if ((i = (i + 1) & 1)) {
       lcd.print(s);
-    else
-      for (int j = 0; j < sl; j++)
-        lcd.print(" ");
-    delay(350);
+      state = digitalRead(BTN_STOP_PIN);
+      delay(400);
+    } else {
+      for (byte j = 0; j < sl; j++)
+        lcd.print(F(" "));
+      state = digitalRead(BTN_STOP_PIN);
+      delay(200);
+    }
   }
   head = initialHeadPosition;
   programPtr = 0;
-  executing = false;
+  setBool(executing, false);
 }
 
 void machineCycle() {
@@ -86,15 +103,15 @@ void machineCycle() {
       if (head > 0)
         head--;
       else
-        showError("End of tape!");
+        showError(F("End of tape!"));
       break;
     case '>':
       if (head < (tapeSize - 1))
         head++;
       else
-        showError("End of tape!");
+        showError(F("End of tape!"));
       break;
-    case '.': executing = false; break;
+    case '.': setBool(executing, false); break;
     default: break;
   }
   if (op == '?') {
@@ -117,12 +134,14 @@ void machineCycle() {
 )
 
 void loadTape() {
-for (size_t i = tapeSize + 1; i > 0; i--)
+  // W.I.P.
+  for (byte i = tapeSize + 1; i > 0; i--)
     tape[i] = (tapeStorage[i / 8] >> (i & 7)) & 1;
 }
 
 void saveTape() {
-  for (size_t i = tapeStorageSize + 1; i > 0; i--)
+  // W.I.P.
+  for (byte i = tapeStorageSize + 1; i > 0; i--)
     tapeStorage[i] = byteIntoBits(tape[i / 8]);
 }
 
@@ -132,28 +151,28 @@ void showTape() {
     lcd.print(tape[i] == 1 ? "1" : "0");
   lcd.setCursor(0, 2);
   for (int i = 0; i < COLUMNS; i++)
-    lcd.print(" ");
+    lcd.print(F(" "));
   lcd.setCursor(0, 2);
   for (size_t i = 0; i < head; i++)
-    lcd.print(" ");
-  lcd.print("^");
+    lcd.print(F(" "));
+  lcd.print(F("^"));
 }
 
 void showState() {
   lcd.setCursor(0, 3);
   for (int i = 0; i < COLUMNS; i++)
-    lcd.print(" ");
+    lcd.print(F(" "));
   lcd.setCursor(0, 3);
-  if (paused) {
-    lcd.print("PAUSE");
-  } else if (executing) {
-    lcd.print("EXEC ");
+  if (getBool(paused)) {
+    lcd.print(F("PAUSE"));
+  } else if (getBool(executing)) {
+    lcd.print(F("EXEC "));
   } else {
-    lcd.print("IDLE ");
+    lcd.print(F("IDLE "));
   }
 
-  if (executing) {
-    lcd.print(" | ");
+  if (getBool(executing)) {
+    lcd.print(F(" | "));
 
     Instruction * current = &program[programPtr];
     lcd.print(current->operation);
@@ -164,17 +183,18 @@ void showState() {
     if (doPrint)
       lcd.print(current->jump[0] + 1);
     if (current->operation == '?') {
-      lcd.print(",");
+      lcd.print(F(","));
       lcd.print(current->jump[1] + 1);
     }
-  } else if (showCycles && !firstTimePaused) {
-    lcd.print(" | N = ");
+  } else if (getBool(showCycles) && !getBool(firstTimePaused)) {
+    lcd.print(F(" | N = "));
     lcd.print(cyclesUsed);
-    showCycles = false;
+    setBool(showCycles, false);
   }
 }
 
 void setup() {
+  // Initializations
   lcd.init();
   lcd.backlight();
 
@@ -188,109 +208,116 @@ void setup() {
   btn_save.begin();
   pinMode(SPEAKER_PIN, OUTPUT);
 
+  tapeStorageSize = (tapeSize + 7) / 8;
+  tapeStorage = malloc(tapeStorageSize);
+
+  // Visuals
   lcd.setCursor(6, 1);
-  const char * hello = "Welcome!";
-  const size_t helloLen = strlen(hello);
-  for (size_t i = 0; i < helloLen; i++) {
-    lcd.print(hello[i]);
+  const __FlashStringHelper * hello = F("Welcome!");
+  byte helloLen;
+  for (helloLen = 0; ; helloLen++) {
+    char c = pgm_read_byte((PGM_P)hello + helloLen);
+    if (c == 0) {
+      break;
+    }
+    lcd.print(c);
     delay(65);
   }
-  tone(SPEAKER, 392, 100);
+
+  tone(SPEAKER_PIN, 392, 100);
   delay(205);
   lcd.setCursor(6, 1);
-  for (size_t i = 0; i < helloLen; i++) {
-    lcd.print(" ");
+  for (byte i = 0; i < helloLen; i++) {
+    lcd.print(F(" "));
     delay(35);
   }
-  tone(SPEAKER, 440, 100);
+  tone(SPEAKER_PIN, 440, 100);
   delay(205);
 
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print("Nano Post Machine");
+  lcd.print(F("Nano Post Machine"));
   showTape();
-
-  tapeStorageSize = int(ceil(tapeSize / 8.0));
-  tapeStorage = malloc(tapeStorageSize);
 }
 
 void loop() {
   bool ready = false;
-  #define READY do { (ready) = true; } while (0)
+#define READY ((ready) = true)
 
-  if (!executing || paused) {
-    if (isButtonDown(BTN_LEFT) && head != 0) {
+  if (!getBool(executing) || getBool(paused)) {
+    if (isButtonDown(btn_left) && head != 0) {
       head -= 1;
       READY;
-    } else if (isButtonDown(BTN_RIGHT) && head < (tapeSize - 1)) {
+    } else if (isButtonDown(btn_right) && head < (tapeSize - 1)) {
       head += 1;
       READY;
-    } else if (isButtonDown(BTN_CHANGE)) {
+    } else if (isButtonDown(btn_change)) {
       tape[head] = 1 - tape[head];
       READY;
-    } else if (isButtonDown(BTN_CLEAR)) {
-      tone(SPEAKER, 293.66, 50);
+    } else if (isButtonDown(btn_clear)) {
+      tone(SPEAKER_PIN, 294, 50);
       delay(25);
-      tone(SPEAKER, 349.23, 50);
+      tone(SPEAKER_PIN, 348, 50);
       delay(25);
 
-      for (size_t i = 0; i < tapeSize; i++)
+      for (byte i = 0; i < tapeSize; i++)
         tape[i] = 0;
 
       lcd.setCursor(8, 3);
-      lcd.print("Tape cleared");
+      lcd.print(F("Tape cleared"));
       showTape();
       while (!anyButtonDown());
       lcd.setCursor(8, 3);
       for (int i = 0; i < 12; i++)
         lcd.print(" ");
-    } else if (isButtonDown(BTN_LOAD)) {
+    } else if (isButtonDown(btn_load)) {
       lcd.setCursor(8, 3);
-      lcd.print("Tape loaded ");
+      lcd.print(F("Tape loaded "));
       loadTape();
       showTape();
       while (!anyButtonDown());
       lcd.setCursor(8, 3);
       for (int i = 0; i < 12; i++)
-        lcd.print(" ");
+        lcd.print(F(" "));
       READY;
-    } else if (isButtonDown(BTN_SAVE)) {
+    } else if (isButtonDown(btn_save)) {
       saveTape();
       lcd.setCursor(8, 3);
-      lcd.print("Tape saved  ");
+      lcd.print(F("Tape saved  "));
       READY;
     }
   }
-  if (isButtonDown(BTN_RUN)) {
-    executing = true;
+
+  if (isButtonDown(btn_run)) {
+    setBool(executing, true);
     cyclesUsed = 0;
     READY;
-  } else if (isButtonDown(BTN_PAUSE)) {
-    paused = !paused;
-    if (paused)
-      firstTimePaused = true;
+  } else if (isButtonDown(btn_pause)) {
+    setBool(paused, !getBool(paused));
+    if (getBool(paused))
+      setBool(firstTimePaused, true);
     else
-      firstTimePaused = false;
+      setBool(firstTimePaused, false);
     READY;
-  } else if (isButtonDown(BTN_STOP)) {
-    executing = false;
-    paused = false;
+  } else if (isButtonDown(btn_stop)) {
+    setBool(executing, false);
+    setBool(paused, false);
     head = initialHeadPosition;
     programPtr = 0;
-    showCycles = true;
+    setBool(showCycles, true);
     READY;
   }
 
-  if (executing) {
-    if (!paused)
+  if (getBool(executing)) {
+    if (!getBool(paused))
       machineCycle();
-    if (!paused || paused && firstTimePaused) {
+    if (!getBool(paused) || getBool(paused) && getBool(firstTimePaused)) {
       showState();
-      firstTimePaused = false;
+      setBool(firstTimePaused, false);
     }
   }
-  if (ready || executing && !paused) {
-    tone(SPEAKER, 2000, 5);
+  if (ready || getBool(executing) && !getBool(paused)) {
+    tone(SPEAKER_PIN, 2000, 5);
     showTape();
   }
 }
